@@ -19,6 +19,10 @@ function Film(id, title, favorites, date, rating){
     this.rating = rating ? rating : undefined;
 }
 
+function printLine(film){
+    console.log(`ID: ${film.id}, Title: ${film.title}, Favourite: ${film.favorites}, Date: ${film.date ? film.date.format('DD/MM/YYYY') : undefined}, Rating: ${film.rating ? film.rating : undefined}`);
+}
+
 function FilmLibrary(){
     this.films = [];
 
@@ -28,6 +32,46 @@ function FilmLibrary(){
         else
             this.films.push(film);
     }
+
+    this.sortByDate = () => {
+        this.films.sort((a,b) => {
+            if(a.date == undefined || a.date.isAfter(b.date)){
+                return 1;
+            } else if(a.date.isBefore(b.date))
+                return -1;
+            else
+                return 0;
+        });
+    }
+
+    this.deleteFilm = (id) => {
+        const newlist = this.films.filter((x) => x.id != id);
+        this.films = newlist;
+    }
+
+    this.resetWatchedFilms = () => {
+        this.films.forEach((x) => x.date = undefined);
+    }
+
+    this.print = () => {
+        for(let film of this.films)
+            printLine(film);
+        console.log('\n');
+    }
+
+    this.getRated = (rating) => {
+        console.log(`***** Films filtered, only the rated ones *****`);
+        const rated = this.films.filter(x => x.rating >= rating);
+        if(rated.length == 0)
+            console.log('No film');
+        else
+            for(let film of rated)
+                printLine(film);
+            console.log('\n');
+    }
+
+    
+
 }
 
 const films = [
@@ -42,4 +86,10 @@ const myLibrary = new FilmLibrary();
 for(let film of films)
     myLibrary.addNewFilm(film);
 
-console.log(myLibrary);
+myLibrary.print();
+myLibrary.sortByDate();
+myLibrary.deleteFilm(3);
+myLibrary.print();
+myLibrary.resetWatchedFilms();
+myLibrary.print();
+myLibrary.getRated(2);
