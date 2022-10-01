@@ -43,4 +43,3 @@ for(let film of films)
     myLibrary.addNewFilm(film);
 
 console.log(myLibrary);
-console.log('yuhu');
