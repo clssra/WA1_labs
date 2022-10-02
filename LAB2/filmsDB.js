@@ -27,7 +27,7 @@ const db = new sqlite.Database('./films.db', (err) => {
 }
 
 function printLine(film){
-    console.log(`ID: ${film.id}, Title: ${film.title}, Favourite: ${!film.favorites ? true : false}, Date: ${film.date ? film.date.format('DD/MM/YYYY') : undefined}, Rating: ${film.rating ? film.rating : undefined}`);
+    console.log(`ID: ${film.id}, Title: ${film.title}, Favorite: ${!film.favorites ? true : false}, Date: ${film.date ? film.date.format('DD/MM/YYYY') : undefined}, Rating: ${film.rating ? film.rating : undefined}`);
 }
 
 function printFilms(films){
