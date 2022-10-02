@@ -112,12 +112,46 @@ function FilmLibrary(){
         });
     }
 
+    this.store = (film) => {
+        return new Promise((resolve, reject) => {
+            const sql = "INSERT INTO films (id, title, favorite, watchdate, rating) VALUES (?, ?, ?, ?, ?)";
+            db.run(sql, [film.id, film.title, film.favorites, film.date, film.rating], (err) => {
+                if(err)
+                    reject(err);
+                else
+                    resolve(true);
+            });
+        });
+    }
+
+    this.delete = (id) => {
+        return new Promise((resolve, reject) => {
+            const sql = "DELETE FROM films WHERE id=?";
+            db.run(sql, [id], (err) => {
+                if(err)
+                    reject(err);
+                else
+                    resolve(true);
+            });
+        });
+    }
+
+    this.deleteAll = async () => {
+        const myFilms = await this.getAll();
+        for(let film of myFilms){
+           if(!await this.delete(film.id)){
+                console.log(`Error in deleting film with id: ${film.id}\n`);
+                return;
+           }
+        }
+        console.log('Deleted all films successfully!\n');
+    }
 
 }
 
 async function main(){
     let myLibrary = new FilmLibrary();
-    const myFilms = await myLibrary.getAll();
+    let myFilms = await myLibrary.getAll();
     printFilms(myFilms);
 
     const myFavorites = await myLibrary.getFavorites();
@@ -152,6 +186,23 @@ async function main(){
         console.log('No film matched title: ' + title);
     else
         printFilms(matchedTitle);
+    
+    const film = new Film(8, 'yuhu', 1, '2022-09-10', 3);
+    if(myLibrary.store(film))
+        console.log(`film with id: ${film.id} inserted successfully`);
+
+    myFilms = await myLibrary.getAll();
+    printFilms(myFilms);
+
+    //const filmID = 8;
+    if(await myLibrary.delete(film.id))
+        console.log(`film with id: ${film.id} deleted successfully`);
+
+    myFilms = await myLibrary.getAll();
+    printFilms(myFilms);
+
+    myLibrary.deleteAll();
+
 }
 
 main();
