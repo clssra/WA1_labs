@@ -27,7 +27,13 @@ const db = new sqlite.Database('./films.db', (err) => {
 }
 
 function printLine(film){
-    console.log(`ID: ${film.id}, Title: ${film.title}, Favourite: ${film.favorites}, Date: ${film.date ? film.date.format('DD/MM/YYYY') : undefined}, Rating: ${film.rating ? film.rating : undefined}`);
+    console.log(`ID: ${film.id}, Title: ${film.title}, Favourite: ${!film.favorites ? true : false}, Date: ${film.date ? film.date.format('DD/MM/YYYY') : undefined}, Rating: ${film.rating ? film.rating : undefined}`);
+}
+
+function printFilms(films){
+    for(let film of films)
+        printLine(film);
+    console.log('\n');
 }
 
 function FilmLibrary(){
@@ -44,12 +50,108 @@ function FilmLibrary(){
         });
     }
 
+
+    this.getFavorites = () => {
+        return new Promise((resolve, reject) => {
+            const sql = 'SELECT * from films WHERE favorite=TRUE';
+            db.all(sql, (err, rows) => {
+                if(err)
+                    reject(err);
+                else
+                    resolve(rows.map(x => new Film(x.id, x.title, x.favorites, x.date, x.rating)));
+            });
+        });
+    }
+
+    this.getToday = () => {
+        return new Promise((resolve, reject) => {
+            const today = dayjs().format('YYYY-MM-DD');
+            const sql = "SELECT * FROM films WHERE watchdate=?";
+            db.all(sql, [today], (err, rows) => {
+                if(err)
+                    reject(err);
+                else
+                    resolve(rows.map(x => new Film(x.id, x.title, x.favorites, x.date, x.rating)));
+            })
+        });
+    }
+
+    this.getBefore = (date) => {
+        return new Promise((resolve, reject) => {
+            const sql = "SELECT * FROM films WHERE watchdate < ?";
+            db.all(sql, [date], (err, rows) => {
+                if(err)
+                    reject(err);
+                else
+                    resolve(rows.map(x => new Film(x.id, x.title, x.favorites, x.date, x.rating)));
+            });
+        });
+    }
+
+    this.getRating = (rating) => {
+        return new Promise((resolve, reject) => {
+            const sql = "SELECT * FROM films WHERE rating >= ?";
+            db.all(sql, [rating], (err, rows) => {
+                if(err)
+                    reject(err);
+                else
+                    resolve(rows.map(x => new Film(x.id, x.title, x.favorites, x.date, x.rating)));
+            });
+        });
+    }
+
+    this.getTitle = (title) => {
+        return new Promise((resolve, reject) => {
+            const sql = "SELECT * FROM films WHERE title=?";
+            db.all(sql, [title], (err, rows) => {
+                if(err)
+                    reject(err);
+                else
+                    resolve(rows.map(x => new Film(x.id, x.title, x.favorites, x.date, x.rating)));
+            });
+        });
+    }
+
+
 }
 
 async function main(){
     let myLibrary = new FilmLibrary();
     const myFilms = await myLibrary.getAll();
-    console.log(myFilms);
+    printFilms(myFilms);
+
+    const myFavorites = await myLibrary.getFavorites();
+    if(myFavorites.lenght == 0)
+        console.log('No favorites films\n');
+    else
+        printFilms(myFavorites);
+
+    const watchedToday = await myLibrary.getToday();
+    if(watchedToday.lenght == 0)
+        console.log('No films watched today\n');
+    else
+        printFilms(watchedToday);
+
+    const date = '2022-05-01';
+    const watchedBefore = await myLibrary.getBefore(date);
+    if(watchedBefore.lenght == 0)
+        console.log('No film watched before: ' + date);
+    else
+        printFilms(watchedBefore);
+    
+    const rating = 3;
+    const ratedMoreThan = await myLibrary.getRating(rating);
+    if(ratedMoreThan.lenght == 0)
+        console.log('No film rated more than: ' + rating);
+    else
+        printFilms(ratedMoreThan);
+    
+    const title = 'Matrix';
+    const matchedTitle = await myLibrary.getTitle(title);
+    if(matchedTitle.lenght == 0)
+        console.log('No film matched title: ' + title);
+    else
+        printFilms(matchedTitle);
 }
 
 main();
