@@ -17,7 +17,7 @@
 
 #left-sidebar {
     background-color: rgb(245, 245, 255);
-    height: 50em;
+    height: 100vh;
 }
 
 #filter-list {
@@ -25,13 +25,15 @@
     margin-left: 1em;
     height: auto;
 }
-/* 
-#add-button {
-    position: static;
-    bottom: 10em;
-    right: 7em;
-    color: springgreen;
-    background-color: lavender;
-    
-} */
+.fixed-right-bottom#button {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: 1030;
+    margin: 0 1.5rem 1.5rem 0;
+    border-radius: 100%;
+    background-color: mediumspringgreen;
+    color: lavender;
+    border-color: white;
+}
 
