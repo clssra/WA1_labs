@@ -37,3 +37,6 @@
     border-color: white;
 }
 
+small.watch-date {
+    text-align: right;
+}
