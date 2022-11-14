@@ -1,23 +1,40 @@
-.favorite {
-    color: lightcoral;
+@font-face {
+    font-family: Oswald-medium;
+    src: url(./font/Oswald-Medium.ttf)
 }
 
-#active {
-    background-color: mediumspringgreen;
+body{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.favorite {
+    font-weight: bolder;
+}
+
+
+.active {
+    background-color: black;
+    color: white;
 }
 
 .navbar {
-    background-color: lavender;
-    color: mediumspringgreen;
+    background-color: white;
+    color: black;
 }
 
-.separator {
-    color: grey;
+#navBrand {
+    color: black;
+}
+
+#navbar-separator {
+    margin: 0px;
+    height: 10px;
+    font-weight: bolder;
 }
 
 #left-sidebar {
-    background-color: rgb(245, 245, 255);
     height: 100vh;
+    
 }
 
 #filter-list {
@@ -32,8 +49,8 @@
     z-index: 1030;
     margin: 0 1.5rem 1.5rem 0;
     border-radius: 100%;
-    background-color: mediumspringgreen;
-    color: lavender;
+    background-color: black;
+    color: white;
     border-color: white;
 }
 

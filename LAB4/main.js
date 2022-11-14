@@ -50,17 +50,17 @@ function FilmLibrary(){
     this.deleteFilm = (id) => {
         const newlist = this.filmLibrary.filter((x) => x.id != id);
         this.filmLibrary = newlist;
-    }
+    };
 
     this.resetWatchedFilms = () => {
         this.filmLibrary.forEach((x) => x.date = undefined);
-    }
+    };
 
     this.print = () => {
         for(let film of this.filmLibrary)
             printLine(film);
         console.log('\n');
-    }
+    };
 
     this.getRated = (rating) => {
         console.log(`***** Films filtered, only the rated ones *****`);
@@ -73,78 +73,114 @@ function FilmLibrary(){
             console.log('\n');
     }
 
+
+    this.getAll = () => {
+        return this.filmLibrary;
+    }
+    
+    this.getFavorites = () => {
+        return this.filmLibrary.filter(x => x.isFavorite());
+    }
+
+    this.bestRated = () => {
+        return this.filmLibrary.filter(x => x.rating == 5);
+    }
+
+    this.getLastMonth = () => {
+        const date30ago = dayjs().subtract(30, 'day');
+        const today = dayjs();
+        return this.filmLibrary.filter(x => {
+            return x.date ? (x.date.isAfter(date30ago) || x.date.isSame(today, 'day')) : undefined;
+        });
+    }
+
 }
 
-function createFilmNode(films){
+function createFilmNode(film){
 
-    const ul = document.querySelector('ul#main-content');
-    ul.innerHTML = '';
+    const li = document.createElement('li');
+    li.id = "film" + film.id;
+    li.className = 'list-group-item';
 
-    films.filmLibrary.forEach(film => {
-        const li = document.createElement('li');
-        li.id = "film" + film.id;
-        li.className = 'list-group-item';
+    // creating a higher <div>
+    const externalDiv = document.createElement('div');
+    externalDiv.className = 'd-flex w-100 justify-content-between';
+
+    // creating a <p> for the title
+    const titleP = document.createElement('p');
+    titleP.className = 'text-start col-md-5 col-3';
+    if(film.isFavorite()) 
+        titleP.className += ' favorite ';
+    titleP.innerText = film.title;
+    externalDiv.appendChild(titleP);
+
+    // creating a "inner" <span> for the checkbox and the 'Favorite' label
+    const innerSpan = document.createElement('span');
+    innerSpan.className = 'custom-control custom-checkbox col-md-1 col-3';
+    innerSpan.style.whiteSpace = 'nowrap';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = "check-f" + film.id;
+    checkbox.className = 'custom-control-input';
+    checkbox.checked = film.isFavorite();
+    innerSpan.appendChild(checkbox);
+
+    const descriptionLabel = document.createElement('label');
+    descriptionLabel.className = 'custom-control-label'; 
+    descriptionLabel.innerHTML = '&nbsp;Favorite';
+    descriptionLabel.htmlFor = "check-f" + film.id;
+    innerSpan.appendChild(descriptionLabel);
+    externalDiv.appendChild(innerSpan);
+
+    // creating a <small> element for the date
+    const dateText = document.createElement('small');
+    dateText.className = 'watch-date col-md-3 col-3';
+    dateText.innerText = film.date ? film.date.format('MMMM D, YYYY') : '';
+    externalDiv.appendChild(dateText);
+
+    // creating a <span> for the rating stars
+    const ratingSpan = document.createElement('span');
+    ratingSpan.className = 'rating text-end col-md-3 col-3';
+
+    for(let i=0; i<5; i++) {
+        const star = (i < film.rating) ? filledStar : emptyStar;
+        ratingSpan.insertAdjacentHTML("beforeend", star); 
+    }
+    externalDiv.appendChild(ratingSpan);
+
+    // adding the external <div> to the <li> before returning it.
+    li.appendChild(externalDiv);
     
-        // creating a higher <div>
-        const externalDiv = document.createElement('div');
-        externalDiv.className = 'd-flex w-100 justify-content-between';
+    return li;
     
-        // creating a <p> for the title
-        const titleP = document.createElement('p');
-        titleP.className = 'text-start col-md-5 col-3';
-        if(film.isFavorite()) 
-            titleP.className += ' favorite ';
-        titleP.innerText = film.title;
-        externalDiv.appendChild(titleP);
-    
-        // creating a "inner" <span> for the checkbox and the 'Favorite' label
-        const innerSpan = document.createElement('span');
-        innerSpan.className = 'custom-control custom-checkbox col-md-1 col-3';
-        innerSpan.style.whiteSpace = 'nowrap';
-    
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = "check-f" + film.id;
-        checkbox.className = 'custom-control-input';
-        checkbox.checked = film.isFavorite();
-        innerSpan.appendChild(checkbox);
-    
-        const descriptionLabel = document.createElement('label');
-        descriptionLabel.className = 'custom-control-label'; 
-        descriptionLabel.innerHTML = '&nbsp;Favorite';
-        descriptionLabel.htmlFor = "check-f" + film.id;
-        innerSpan.appendChild(descriptionLabel);
-        externalDiv.appendChild(innerSpan);
-    
-        // creating a <small> element for the date
-        const dateText = document.createElement('small');
-        dateText.className = 'watch-date col-md-3 col-3';
-        dateText.innerText = film.date ? film.date.format('MMMM D, YYYY') : '';
-        externalDiv.appendChild(dateText);
-    
-        // creating a <span> for the rating stars
-        const ratingSpan = document.createElement('span');
-        ratingSpan.className = 'rating text-end col-md-3 col-3';
-    
-        for(let i=0; i<5; i++) {
-            const star = (i < film.rating) ? filledStar : emptyStar;
-            ratingSpan.insertAdjacentHTML("beforeend", star); 
-        }
-        externalDiv.appendChild(ratingSpan);
-    
-        // adding the external <div> to the <li> before returning it.
-        li.appendChild(externalDiv);
-        ul.appendChild(li);
+}
+
+function generateListFilms(filmLibrary){
+    const ulFilmList = document.getElementById('film-list');
+    filmLibrary.forEach(film => {
+        const filmNode = createFilmNode(film);
+        ulFilmList.appendChild(filmNode);
     });
-
     
 }
 
-const films = new FilmLibrary();
-films.addNewFilm(new Film(1, "Pulp Fiction", true, "2022-03-10", 5));
-films.addNewFilm(new Film(2, "21 Grams", true, '2022-03-17', 4));
-films.addNewFilm(new Film(3, 'Star Wars', false));
-films.addNewFilm(new Film(4, 'Matrix', false));
-films.addNewFilm(new Film(5, 'Shrek', false, '2022-03-21', 3));
+function clearFilterList(){
+    
+}
 
-createFilmNode(films);
+// MAIN
+
+const filmLibrary = new FilmLibrary();
+FILMS.forEach(film => filmLibrary.addNewFilm(new Film(...film)));
+generateListFilms(filmLibrary.getAll());
+
+console.log(filmLibrary.getAll());
+console.log(filmLibrary.getFavorites());
+console.log(filmLibrary.bestRated());
+console.log(filmLibrary.getLastMonth());
+//reateFilmNode(filmLibrary);
+
+document.querySelector('#filter-favorites').addEventListener('click', event => {
+    generateListFilms(filmLibrary.getFavorites());
+})
